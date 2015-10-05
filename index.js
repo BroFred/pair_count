@@ -1,4 +1,4 @@
-var hold =require('./co-occur.js').x;
-hold('/Users/Frederic/desktop/example.txt',function(res){
-	console.log(res);
+var hold =require('./co-occur.js').stdinPair;
+hold(function(res){
+	process.stdout.write(res);
 });
