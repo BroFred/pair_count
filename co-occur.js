@@ -8,32 +8,36 @@ var modulePair=function(link,callback){
 	var option={'cwd':cwd};
 	var hold=[];
 	var target;
+	function rfile(count,hold,tlen){ //read data to memory
+		child.exec("awk \'NR=="+count+"{print $0}\' "+filename,option,function(err,out,errout){
+			var outArr,outArr2=[],col,dic={},temp;
+			outArr=out.replace(/\n/,'');
+			outArr=outArr.split(',');
+			while(outArr.length){
+				temp=outArr.shift().trim();
+				if(!dic[temp]){
+					dic[temp]=1;
+					outArr2.push(temp);
+				}
+			}
+			outArr2.sort();
+			hold.push(outArr2);
+		}).on('exit',function(){
+			if(hold.length===tlen){
+				CreateDic(hold,callback,target); //when complete reading call
+			}
+			else{
+				rfile(++count,hold,tlen);
+			}
+		});
+	}
 	child.exec("wc -l "+filename,option,function(err,out,errout){ //count total lines
-			var count=1;
-			count=parseInt(out);
+			var count=parseInt(out);
 			child.exec("awk \'NR==1{print $0}\' "+filename,option,function(err,out,errout){
 				target=parseInt(out);
-				for(var i=2;i<=count+1;i++){// read string to array
-					(function(count,hold,tlen){
-						child.exec("awk \'NR=="+count+"{print $0}\' "+filename,option,function(err,out,errout){
-								var outArr,outArr2=[],col,dic={},temp;
-								outArr=out.replace(/\n/,'');
-								outArr=outArr.split(',');
-								while(outArr.length){
-									temp=outArr.shift().trim();
-									if(!dic[temp]){
-										dic[temp]=1;
-										outArr2.push(temp);
-									}
-								}
-								outArr2.sort();
-								hold.push(outArr2);
-								if(hold.length===tlen){
-									CreateDic(hold,callback,target); //when complete reading call
-								}
-						});
-					})(i,hold,count);
-				}
+				// read string to array
+				rfile(2,hold,count);
+				//
 			});
 	});
 	function CreateDic(hold,callback,target){

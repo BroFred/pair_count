@@ -1,9 +1,10 @@
-demo/test in the test.js
+
 This piece of code runs in 
 1.stdin mode by using node index < exapmle.txt > res.txt
 2.module(file) mode: 
 basically co-occur.js export a function which take two parameters
 file directory and callback function(callback(res) res is the result)
+demo/test in the test.js
 
 
 
